@@ -29,9 +29,6 @@ class App extends React.Component {
   handleChange(event) {
     this.setState({city_value: event.target.value});
   }
-  getCityName(){
-    return this.state.city_value;
-  }
   render(){
     return(
       <Router>
@@ -75,7 +72,12 @@ function detectBottom(){
 class Scenicspot extends App {
   constructor(props){
     super(props);
-    this.url = spoturl;
+    if (props.cityname === undefined){
+      this.url = spoturl;
+    }
+    else{
+      this.url = baseURL+'/' +props.cityname +baseReqDemand;}
+    console.log("URL:",this.url);
     this.state = {data:[],isLoading:false, count:0};
     this.handleScroll = this.handleScroll.bind(this);
   }
@@ -95,9 +97,7 @@ class Scenicspot extends App {
   }
   componentDidMount() {
     window.addEventListener("scroll", this.handleScroll);
-    const cityspot = this;
-    cityspot.url = spoturl;
-    fetch(cityspot.url)
+    fetch(this.url)
     .then(res=> res.json())
     .then((result)=>{
       this.setState({
@@ -108,6 +108,9 @@ class Scenicspot extends App {
     }
   componentWillUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
+    this.setState({
+      isLoading:false
+    });
     }
   
   render() {
@@ -125,23 +128,44 @@ class Scenicspot extends App {
 class Cityspot extends App {
   constructor(props){
     super(props);
-    this.cityname=props.cityname;
-    this.url = baseURL+'/' +this.cityname +baseReqDemand;
+    this.url = baseURL+'/' +props.cityname +baseReqDemand;
+    console.log("URL:",this.url);
     this.state = {data:[],isLoading:false, count:0};
-    console.log("HAHA:", this.cityname);
+    this.handleScroll = this.handleScroll.bind(this);
   }
-  componentDidMount(){
-    const cityspot = this;
-    fetch(cityspot.url)
+  handleScroll(event){
+    if (detectBottom()) {
+      let request = new XMLHttpRequest();
+      this.state.count++;
+      request.open('GET', this.url+'&$skip=' + String(30*(this.state.count)));
+      let olddata= this.state.data;
+      const scenic = this;
+      request.onload = function () {
+        let newdata = olddata.concat(JSON.parse(this.response));
+        scenic.setState({data : newdata});
+      }
+      request.send();
+    };
+  }
+  componentDidMount() {
+    window.addEventListener("scroll", this.handleScroll);
+    fetch(this.url)
     .then(res=> res.json())
     .then((result)=>{
       this.setState({
         data : result,
         isLoading:true
+        })
       })
-    })
-  }
-  render(){
+    }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
+    this.setState({
+      isLoading:false
+    });
+    }
+  
+  render() {
     const { data , isLoading, count } = this.state;
     if (!isLoading){
       return <div>Loading...</div>;
@@ -151,7 +175,7 @@ class Cityspot extends App {
         {data.map(dat=><div><h2>{dat.Name}</h2><p>{dat.Description}</p></div>)}
       </div>);
     }
-  }
+    }
 }
 
 function Home() {
