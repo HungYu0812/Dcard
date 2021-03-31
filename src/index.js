@@ -19,17 +19,14 @@ let citys ={
   '嘉義市':'Chiayi','屏東縣':'PingtungCounty','宜蘭縣':'YilanCounty','花蓮縣':'HualienCounty',
   '臺東縣':'TaitungCounty','金門縣':'KinmenCounty','澎湖縣':'PenghuCounty','連江縣':'LienchiangCounty'
   };
-let city;
 
 class App extends React.Component {
   constructor(props){
     super(props);
     this.state = {city_value: []};
-    this.city_value=[];
     this.handleChange = this.handleChange.bind(this);
   }
   handleChange(event) {
-    city = event.target.value;
     this.setState({city_value: event.target.value});
   }
   getCityName(){
@@ -52,7 +49,9 @@ class App extends React.Component {
         </nav>
         <Switch>
           <Route exact path="/scenicSpot" component={Scenicspot} />
-          <Route path={`/scenicSpot/${this.state.city_value}`} component={Cityspot} />
+          <Route path={`/scenicSpot/${this.state.city_value}`}>
+            <Cityspot cityname={this.state.city_value} />
+          </Route>
           <Route path="/">
             <Home />
           </Route>
@@ -62,6 +61,8 @@ class App extends React.Component {
     );
   }
 }
+
+//偵測是否抵達網頁底部
 function detectBottom(){
   const body = document.body;
   const windowHeight = "innerHeight" in window ? window.innerHeight : document.documentElement.offsetHeight;
@@ -121,18 +122,16 @@ class Scenicspot extends App {
     }
     }
 }
-function Home() {
-  return <h2>Home</h2>;
-}
 class Cityspot extends App {
   constructor(props){
     super(props);
-    this.url = baseURL+'/' +city +baseReqDemand;
+    this.cityname=props.cityname;
+    this.url = baseURL+'/' +this.cityname +baseReqDemand;
     this.state = {data:[],isLoading:false, count:0};
+    console.log("HAHA:", this.cityname);
   }
   componentDidMount(){
     const cityspot = this;
-    cityspot.url = baseURL+'/' +city +baseReqDemand;
     fetch(cityspot.url)
     .then(res=> res.json())
     .then((result)=>{
@@ -153,6 +152,10 @@ class Cityspot extends App {
       </div>);
     }
   }
+}
+
+function Home() {
+  return <h2>Home</h2>;
 }
 
 export {App};
