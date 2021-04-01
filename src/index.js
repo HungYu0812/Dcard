@@ -7,11 +7,9 @@ import {
   Link
 } from "react-router-dom";
 import './index.css';
-
-const rootElement = document.getElementById("root");
+//設定常用參數
 let baseURL = 'https://ptx.transportdata.tw/MOTC/v2/Tourism/ScenicSpot';
 let baseReqDemand = '?$top=30&$format=JSON'
-let spoturl = baseURL+ baseReqDemand;
 let citys ={
   '臺北市':'Taipei','新北市':'NewTaipei','桃園市':'Taoyuan','臺中市':'Taichung','臺南市':'Tainan',
   '高雄市':'Kaohsiung','基隆市':'Keelung','新竹市':'Hsinchu','新竹縣':'HsinchuCounty','苗栗縣':'MiaoliCounty',
@@ -36,8 +34,8 @@ class App extends React.Component {
         <nav>
           <ul>
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/scenicSpot">Scenic Spot</Link></li>
-            <li><Link to={`/scenicSpot/${this.state.city_value}`}>Users</Link></li>
+            <li><Link to="/scenicSpot">Scenic spot</Link></li>
+            <li><Link to={`/scenicSpot/${this.state.city_value}`}>City spot</Link></li>
             <select onChange={this.handleChange}>
               <option>選擇縣市</option>
               {Object.keys(citys).map(key=>(<option value = {citys[key]}>{key}</option>))}
@@ -46,10 +44,10 @@ class App extends React.Component {
         </nav>
         <Switch>
           <Route exact path="/scenicSpot" component={Scenicspot} />
-          <Route path={`/scenicSpot/${this.state.city_value}`}>
+          <Route exact path={`/scenicSpot/${this.state.city_value}`}>
             <Cityspot cityname={this.state.city_value} />
           </Route>
-          <Route path="/">
+          <Route exact path="/">
             <Home />
           </Route>
         </Switch>
@@ -73,7 +71,7 @@ class Scenicspot extends App {
   constructor(props){
     super(props);
     if (props.cityname === undefined){
-      this.url = spoturl;
+      this.url = baseURL+ baseReqDemand;
     }
     else{
       this.url = baseURL+'/' +props.cityname +baseReqDemand;}
@@ -114,7 +112,7 @@ class Scenicspot extends App {
     }
   
   render() {
-    const { data , isLoading, count } = this.state;
+    const { data , isLoading, } = this.state;
     if (!isLoading){
       return <div>Loading...</div>;
     } else{
@@ -128,27 +126,16 @@ class Scenicspot extends App {
 class Cityspot extends Scenicspot {
   constructor(props){
     super(props);
-    this.url = baseURL+'/' +props.cityname +baseReqDemand;
     console.log("URL:",this.url);
-    this.state = {data:[],isLoading:false, count:0};
-    this.handleScroll = this.handleScroll.bind(this);
   }
-
-  render() {
-    const { data , isLoading, count } = this.state;
-    if (!isLoading){
-      return <div>Loading...</div>;
-    } else{
-      return(
-      <div onScroll={this.handleScroll}>
-        {data.map(dat=><div><h2>{dat.Name}</h2><p>{dat.Description}</p></div>)}
-      </div>);
-    }
-    }
 }
 
-function Home() {
-  return <h2>Home</h2>;
+class Home extends React.Component {
+  render(){
+    return(
+      <h2>HOME</h2>
+      )
+  };
 }
 
 export {App};
@@ -156,5 +143,5 @@ ReactDOM.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-  rootElement
+  document.getElementById("root")
 );
