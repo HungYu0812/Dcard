@@ -1,6 +1,6 @@
 # Getting Started with Create React App
 
-This project is for Dcard web frontend intern. if you want to know the requirement, you could check the [document] (./Dcard-2021 Web Frontend Intern Homework.pdf)
+This project is for Dcard web frontend intern. if you want to know the requirement, you could check the [document](Dcard-2021 Web Frontend Intern Homework.pdf)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
